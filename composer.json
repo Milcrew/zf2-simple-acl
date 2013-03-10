@@ -13,9 +13,6 @@
     "autoload": {
         "psr-0": {
             "ProjectStarter": "src/"
-        },
-        "classmap": [
-            "Module.php"
-        ]
+        }
     }
 }

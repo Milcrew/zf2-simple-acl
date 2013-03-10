@@ -1,7 +1,6 @@
 <?php
 namespace ProjectStarter\Debug;
 
-class Utility {
     /**
      * Function for debug
      *
@@ -10,11 +9,11 @@ class Utility {
      *
      * @param mixed
      */
-    public static function dump()
+    function dump()
     {
         $p = func_get_args();
         foreach ($p as $arg) {
-            self::dumpAlive($arg);
+            dumpAlive($arg);
         }
         exit(0);
     }
@@ -23,7 +22,7 @@ class Utility {
      * @see dump()
      * no exit at the end
      */
-    public static function dumpAlive()
+    function dumpAlive()
     {
         echo "<pre>";
 
@@ -48,4 +47,3 @@ class Utility {
         }
         echo "</pre>";
     }
-}
