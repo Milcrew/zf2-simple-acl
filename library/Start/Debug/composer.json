@@ -1,0 +1,13 @@
+{
+    "name": "startframework/debug",
+    "autoload": {
+        "psr-0": {
+            "Start\\Debug\\": ""
+        }
+    },
+    "target-dir": "Start/Debug",
+    
+    "require": {
+        "php": ">=5.3.3"
+    }
+}
