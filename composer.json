@@ -1,7 +1,12 @@
 {
     "name": "milcrew/project-starter",
-    "description": "Project Starter",
-    "type": "library",
+    "description": "Utilities",
+    "authors": [
+        {
+            "name": "Milotskiy Alexey",
+            "email": "spalaxinco@gmail.com"
+        }
+    ],
     "keywords": [
         "utils"
     ],
@@ -14,5 +19,6 @@
         "psr-0": {
             "ProjectStarter": "src/"
         }
-    }
+    },
+    "minimum-stability": "dev"
 }
