@@ -1,11 +1,16 @@
 {
-    "name": "milcrew/project-starter",
-    "description": "Project Starter",
-    "type": "library",
+    "name": "spalax/project-starter",
+    "description": "Utilities",
+    "authors": [
+        {
+            "name": "Milotskiy Alexey",
+            "email": "spalaxinco@gmail.com"
+        }
+    ],
     "keywords": [
         "utils"
     ],
-    "license": "BSD-3-Clause",
+    "license": "MIT",
     "require": {
         "php": ">=5.3",
         "zendframework/zendframework": ">=2.0.0"
@@ -14,5 +19,6 @@
         "psr-0": {
             "ProjectStarter": "src/"
         }
-    }
+    },
+    "minimum-stability": "dev"
 }
