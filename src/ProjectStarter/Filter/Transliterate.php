@@ -27,59 +27,39 @@
  *
  *  @author Milotskiy Alexey (aka SpalaX)
  */
+namespace ProjectStarter\Filter;
 
-namespace ProjectStarter\Debug;
+use Zend\Filter\AbstractFilter;
 
 /**
  * @package    Debug
  * @copyright  Copyright (c) 2010-2013 Milcrew Inc. (http://www.milcrew.com)
  * @license    http://milcrew.com/public/LICENSE.txt    New BSD License
  */
-class Utility {
+class Transliterate extends AbstractFilter
+{
     /**
-     * Function for debug
-     *
-     * Display all recived parameters with
-     * good formating in Browser and exit after
-     *
-     * @param mixed
+     * @var boolean
      */
-    public static function dump()
+    protected $replaceSpacesWithDashes = false;
+
+    public function __construct(array $options = array())
     {
-        $p = func_get_args();
-        foreach ($p as $arg) {
-            self::dumpAlive($arg);
+        if (array_key_exists('replace_spaces_with_dashes', $options)) {
+            $this->replaceSpacesWithDashes = true;
         }
-        exit(0);
     }
 
     /**
-     * @see dump()
-     * no exit at the end
+     * @param string $value
+     * @return string
      */
-    public static function dumpAlive()
+    public function filter($value)
     {
-        echo "<pre>";
-
-        $i = 1;
-        $args = func_get_args();
-        array_walk_recursive($args, function(&$item, $key){
-            if ($item === "") {
-                $item = '""';
-            } elseif ($item === true) {
-                $item = 'true (boolean)';
-            } elseif  ($item === false) {
-                $item = 'false (boolean)';
-            } elseif (is_null($item)) {
-                $item = 'NULL';
-            }
-        });
-
-        foreach ($args as $arg) {
-            echo "VAR ".$i++."\n";
-            print_r($arg);
-            echo "\n\n";
+        $transliterated = \URLify::transliterate($value);
+        if ($this->replaceSpacesWithDashes) {
+            $transliterated = str_replace('\s', '_', $transliterated);
         }
-        echo "</pre>";
+        return $transliterated;
     }
 }
