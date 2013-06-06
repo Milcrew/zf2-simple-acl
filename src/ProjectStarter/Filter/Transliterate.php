@@ -30,6 +30,7 @@
 namespace ProjectStarter\Filter;
 
 use Zend\Filter\AbstractFilter;
+use Zend\Filter\Word\SeparatorToSeparator;
 
 /**
  * @package    Debug
@@ -58,7 +59,8 @@ class Transliterate extends AbstractFilter
     {
         $transliterated = \URLify::transliterate($value);
         if ($this->replaceSpacesWithDashes) {
-            $transliterated = str_replace('\s', '_', $transliterated);
+            $filter = new SeparatorToSeparator(' ', '_');
+            $transliterated = $filter->filter($transliterated);
         }
         return $transliterated;
     }
