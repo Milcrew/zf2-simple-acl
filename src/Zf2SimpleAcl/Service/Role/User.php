@@ -1,5 +1,5 @@
 <?php
-namespace Front\Acl\Role;
+namespace Zf2SimpleAcl\Role;
 
 use Zend\Permissions\Acl\Role\GenericRole;
 use Front\Entities\UserInterface;

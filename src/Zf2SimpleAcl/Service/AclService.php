@@ -1,17 +1,17 @@
 <?php
-namespace Acl\Service;
+namespace Zf2SimpleAcl\Service;
 
 use Doctrine\ORM\EntityManager;
 use Zend\Permissions\Acl\Resource\GenericResource;
 use Zend\Authentication\AuthenticationService;
 use Zend\Permissions\Acl\Acl;
-use Acl\Service\Exception\DomainException;
-use Acl\Service\Role\Role;
-use Acl\Service\Role\User;
+use Zf2SimpleAcl\Service\Exception\DomainException;
+use Zf2SimpleAcl\Service\Role\Role;
+use Zf2SimpleAcl\Service\Role\User;
 
 class AclService
 {
-    const DEFAULT_ROLE = \Acl\Entities\Role::GUEST;
+    const DEFAULT_ROLE = \Zf2SimpleAcl\Entities\Role::GUEST;
 
     /**
      * @var \Zend\Permissions\Acl\Acl
@@ -38,7 +38,7 @@ class AclService
                                 array $restrictions = array())
     {
         $this->authService = $authService;
-        $this->defaultRoleEntity = $entityManager->find('Acl\Entities\Role', static::DEFAULT_ROLE);
+        $this->defaultRoleEntity = $entityManager->find('Zf2SimpleAcl\Entities\Role', static::DEFAULT_ROLE);
 
         $this->initAcl($entityManager);
         $this->initConstantRestrictions($restrictions, $entityManager);
@@ -55,7 +55,7 @@ class AclService
         $this->acl = new \Zend\Permissions\Acl\Acl();
         $this->acl->deny(null, null, null);
 
-        $roleRepository = $entityManager->getRepository('Acl\Entities\Role');
+        $roleRepository = $entityManager->getRepository('Zf2SimpleAcl\Entities\Role');
         $roles = $roleRepository->findAll();
 
         /* @var $role \Front\Entities\Role */
@@ -63,7 +63,7 @@ class AclService
             $this->acl->addRole(new Role($role), is_null($role->getParent()) ? null : new Role($role->getParent()));
         }
 
-        $userRepository = $entityManager->getRepository('Acl\Entities\User');
+        $userRepository = $entityManager->getRepository('Zf2SimpleAcl\Entities\User');
         $users = $userRepository->findAll();
 
         /* @var $user \Front\Entities\User */
@@ -87,7 +87,7 @@ class AclService
             }
 
             foreach ($roles as $role=>$allow) {
-                $roleEntity = $entityManager->find('Acl\Entities\Role', $role);
+                $roleEntity = $entityManager->find('Zf2SimpleAcl\Entities\Role', $role);
                 if (is_null($roleEntity)) {
                     throw new DomainException('Could not find defined role id '.$role);
                 }
@@ -118,7 +118,7 @@ class AclService
     }
 
     /**
-     * @return \Front\Acl\Role\User|NULL
+     * @return Zf2SimpleAcl\Role\User|NULL
      */
     protected function getAclRoleUser()
     {

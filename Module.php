@@ -1,5 +1,5 @@
 <?php
-namespace Acl;
+namespace Zf2SimpleAcl;
 
 use Zend\Mvc\MvcEvent;
 
@@ -17,8 +17,8 @@ class Module
 
         $eventManager = $e->getApplication()->getEventManager();
 
-        $eventManager->attach($di->get('Acl\Guard\RouteGuard'));
-        $eventManager->attach($di->get('Acl\View\Strategy\RedirectionStrategy'));
+        $eventManager->attach($di->get('Zf2SimpleAcl\Guard\RouteGuard'));
+        $eventManager->attach($di->get('Zf2SimpleAcl\View\Strategy\RedirectionStrategy'));
     }
 
     public function getConfig()

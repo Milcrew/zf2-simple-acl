@@ -1,7 +1,7 @@
 <?php
-namespace Acl\Guard;
+namespace Zf2SimpleAcl\Guard;
 
-use Acl\Service\AclService;
+use Zf2SimpleAcl\Service\AclService;
 use Zend\Authentication\AuthenticationService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
@@ -87,9 +87,7 @@ class RouteGuard implements ListenerAggregateInterface
         /* @var $application \Zend\Mvc\ApplicationInterface */
         $application = $event->getApplication();
 
-        /* @var $aclService \Front\Acl\AclService */
-        $aclService = $application->getServiceManager()->get('Front\Acl\AclService');
-        if ($aclService->isAllowed('route/'.$route)) {
+        if ($this->aclService->isAllowed('route/'.$route)) {
             return;
         }
 

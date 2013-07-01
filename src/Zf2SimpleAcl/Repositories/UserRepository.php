@@ -1,6 +1,6 @@
 <?php
 
-namespace Acl\Repositories;
+namespace Zf2SimpleAcl\Repositories;
 
 use Doctrine\ORM\EntityRepository;
 

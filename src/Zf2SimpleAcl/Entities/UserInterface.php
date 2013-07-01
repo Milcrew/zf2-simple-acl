@@ -1,5 +1,5 @@
 <?php
-namespace Acl\Entities;
+namespace Zf2SimpleAcl\Entities;
 
 interface UserInterface extends \ZfcUser\Entity\UserInterface
 {

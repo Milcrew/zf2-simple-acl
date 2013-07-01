@@ -1,11 +1,11 @@
 <?php
-namespace Acl\View\Strategy;
+namespace Zf2SimpleAcl\View\Strategy;
 
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
-use Acl\Guard\RouteGuard;
+use Zf2SimpleAcl\Guard\RouteGuard;
 
 class RedirectionStrategy implements ListenerAggregateInterface
 {

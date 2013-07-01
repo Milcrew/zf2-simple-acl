@@ -1,8 +1,8 @@
 <?php
-namespace Acl\Service\Role;
+namespace Zf2SimpleAcl\Service\Role;
 
 use Zend\Permissions\Acl\Role\GenericRole;
-use Acl\Entities\RoleInterface;
+use Zf2SimpleAcl\Entities\RoleInterface;
 
 class Role extends GenericRole
 {

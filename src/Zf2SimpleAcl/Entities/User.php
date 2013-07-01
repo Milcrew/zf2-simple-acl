@@ -1,5 +1,5 @@
 <?php
-namespace Acl\Entities;
+namespace Zf2SimpleAcl\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
  * User
  *
  * @ORM\Table(name="user")
- * @ORM\Entity(repositoryClass="Acl\Repositories\UserRepository")
+ * @ORM\Entity(repositoryClass="Zf2SimpleAcl\Repositories\UserRepository")
  */
 class User implements UserInterface
 {
@@ -203,10 +203,10 @@ class User implements UserInterface
     /**
      * Set role
      *
-     * @param \Acl\Entities\Role $role
+     * @param \Zf2SimpleAcl\Entities\Role $role
      * @return User
      */
-    public function setRole(\Acl\Entities\Role $role = null)
+    public function setRole(\Zf2SimpleAcl\Entities\Role $role = null)
     {
         $this->role = $role;
     
@@ -216,7 +216,7 @@ class User implements UserInterface
     /**
      * Get role
      *
-     * @return \Acl\Entities\Role 
+     * @return \Zf2SimpleAcl\Entities\Role
      */
     public function getRole()
     {

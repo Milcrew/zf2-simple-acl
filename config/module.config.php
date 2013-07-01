@@ -1,5 +1,5 @@
 <?php
-namespace Acl;
+namespace Zf2SimpleAcl;
 
 return array(
     'service_manager' => include __DIR__ . '/module/service_manager.config.php',
@@ -20,11 +20,11 @@ return array(
             'front_driver' => array(
                 'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
                 'cache' => 'array',
-                'paths' => array(__DIR__ . '/../src/Acl/Entities')
+                'paths' => array(__DIR__ . '/../src/Zf2SimpleAcl/Entities')
             ),
             'orm_default' => array(
                 'drivers' => array(
-                    'Acl\Entities' => 'front_driver'
+                    'Zf2SimpleAcl\Entities' => 'front_driver'
                 )
             )
         )

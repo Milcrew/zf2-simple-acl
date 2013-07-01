@@ -1,4 +1,4 @@
 <?php
-namespace Acl\Service\Exception;
+namespace Zf2SimpleAcl\Service\Exception;
 
 class DomainException extends \DomainException {}

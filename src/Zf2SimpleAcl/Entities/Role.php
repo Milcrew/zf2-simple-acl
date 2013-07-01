@@ -1,5 +1,5 @@
 <?php
-namespace Acl\Entities;
+namespace Zf2SimpleAcl\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Role
  *
  * @ORM\Table(name="role")
- * @ORM\Entity(repositoryClass="Acl\Repositories\RoleRepository")
+ * @ORM\Entity(repositoryClass="Zf2SimpleAcl\Repositories\RoleRepository")
  */
 class Role implements RoleInterface
 {
