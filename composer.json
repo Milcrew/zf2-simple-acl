@@ -25,7 +25,7 @@
     },
     "autoload": {
         "psr-0": {
-            "Zf2Libs": "src/"
+            "Zf2SimpleAcl": "src/"
         }
     },
     "minimum-stability": "dev"
