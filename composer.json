@@ -1,0 +1,25 @@
+{
+    "name": "spalax/project-starter",
+    "description": "Utilities",
+    "authors": [
+        {
+            "name": "Milotskiy Alexey",
+            "email": "spalaxinco@gmail.com"
+        }
+    ],
+    "keywords": [
+        "utils"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3",
+        "zendframework/zendframework": ">=2.0.0",
+        "jbroadway/urlify": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "ProjectStarter": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
