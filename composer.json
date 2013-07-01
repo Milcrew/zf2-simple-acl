@@ -26,7 +26,10 @@
     "autoload": {
         "psr-0": {
             "Zf2SimpleAcl": "src/"
-        }
+        },
+        "classmap": [
+            "./Module.php"
+        ]
     },
     "minimum-stability": "dev"
 }

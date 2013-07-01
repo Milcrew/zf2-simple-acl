@@ -2,8 +2,10 @@
 namespace Zf2SimpleAcl;
 
 use Zend\Mvc\MvcEvent;
+use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+use Zend\ModuleManager\Feature\ConfigProviderInterface;
 
-class Module
+class Module implements AutoloaderProviderInterface, ConfigProviderInterface
 {
     public function onBootstrap(MvcEvent $e)
     {
@@ -13,7 +15,7 @@ class Module
         /* @var $di \Zend\Di\Di */
         $di = $sm->get('di');
         $di->instanceManager()->addSharedInstance($sm->get('Doctrine\ORM\EntityManager'),
-                                                           'Doctrine\ORM\EntityManager');
+            'Doctrine\ORM\EntityManager');
 
         $eventManager = $e->getApplication()->getEventManager();
 
