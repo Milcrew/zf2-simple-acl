@@ -94,7 +94,10 @@ class AclService
             foreach ($roles as $role=>$allow) {
                 $roleEntity = $entityManager->find('Zf2SimpleAcl\Entities\Role', $role);
                 if (is_null($roleEntity)) {
-                    throw new DomainException('Could not find defined role id '.$role);
+
+                    throw new DomainException('Could not find defined role id='.$role.'.
+                                               Please make sure that you have role with current id in your
+                                               database inside role table');
                 }
                 $aclRole = new RoleRole($roleEntity);
                 $this->acl->{$allow ? 'allow': 'deny'}($aclRole, $aclResource);
@@ -111,7 +114,7 @@ class AclService
     }
 
     /**
-     * @return RoleInterface
+     * @return RoleRole
      */
     public function getAclRole()
     {

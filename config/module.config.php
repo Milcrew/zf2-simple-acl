@@ -2,6 +2,14 @@
 namespace Zf2SimpleAcl;
 
 return array(
+// Sample config with one route which allowed for role guest.
+// and for all roles who based on this role.
+//
+//    'zf2simpleacl' => array(
+//        'restrictions' => array(
+//            'route/main' => array(\Zf2SimpleAcl\Entities\Role::GUEST => true)
+//        )
+//    ),
     'translator' => array(
         'locale' => 'ru_RU',
         'translation_file_patterns' => array(
