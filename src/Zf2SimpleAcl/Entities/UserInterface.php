@@ -1,8 +1,13 @@
 <?php
 namespace Zf2SimpleAcl\Entities;
 
-interface UserInterface extends \ZfcUser\Entity\UserInterface
+interface UserInterface
 {
+    /**
+     * @return int
+     */
+    public function getId();
+
     /**
      * Get role
      *

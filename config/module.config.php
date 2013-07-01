@@ -2,8 +2,6 @@
 namespace Zf2SimpleAcl;
 
 return array(
-    'service_manager' => include __DIR__ . '/module/service_manager.config.php',
-
     'translator' => array(
         'locale' => 'ru_RU',
         'translation_file_patterns' => array(

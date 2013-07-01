@@ -1,11 +1,12 @@
 <?php
 namespace Zf2SimpleAcl;
 
+use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 
-class Module implements AutoloaderProviderInterface, ConfigProviderInterface
+class Module implements AutoloaderProviderInterface, ConfigProviderInterface, ServiceProviderInterface
 {
     public function onBootstrap(MvcEvent $e)
     {
@@ -15,7 +16,13 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface
         /* @var $di \Zend\Di\Di */
         $di = $sm->get('di');
         $di->instanceManager()->addSharedInstance($sm->get('Doctrine\ORM\EntityManager'),
-            'Doctrine\ORM\EntityManager');
+                                                  'Doctrine\ORM\EntityManager');
+
+        $config = $sm->get('config');
+        $di->instanceManager()->setParameters('Zf2SimpleAcl\Options\ModuleOptions',
+                                              isset($config['zf2simpleacl']) ? $config['zf2simpleacl'] : array());
+        $di->instanceManager()->setTypePreference('Zf2SimpleAcl\Options\RestrictionOptionsInterface',
+                                                  array('Zf2SimpleAcl\Options\ModuleOptions'));
 
         $eventManager = $e->getApplication()->getEventManager();
 
@@ -26,6 +33,15 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
+    }
+
+    public function getServiceConfig()
+    {
+        return array(
+            'factories' => array(
+                'translator' => 'Zend\I18n\Translator\TranslatorServiceFactory'
+            )
+        );
     }
 
     public function getAutoloaderConfig()

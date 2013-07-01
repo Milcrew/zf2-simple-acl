@@ -5,9 +5,10 @@ use Doctrine\ORM\EntityManager;
 use Zend\Permissions\Acl\Resource\GenericResource;
 use Zend\Authentication\AuthenticationService;
 use Zend\Permissions\Acl\Acl;
+use Zf2SimpleAcl\Options\RestrictionOptionsInterface;
 use Zf2SimpleAcl\Service\Exception\DomainException;
-use Zf2SimpleAcl\Service\Role\Role;
-use Zf2SimpleAcl\Service\Role\User;
+use Zf2SimpleAcl\Role\RoleRole;
+use Zf2SimpleAcl\Role\UserRole;
 
 class AclService
 {
@@ -35,13 +36,13 @@ class AclService
      */
     public function __construct(AuthenticationService $authService,
                                 EntityManager $entityManager,
-                                array $restrictions = array())
+                                RestrictionOptionsInterface $moduleOptions)
     {
         $this->authService = $authService;
         $this->defaultRoleEntity = $entityManager->find('Zf2SimpleAcl\Entities\Role', static::DEFAULT_ROLE);
 
         $this->initAcl($entityManager);
-        $this->initConstantRestrictions($restrictions, $entityManager);
+        $this->initConstantRestrictions($moduleOptions, $entityManager);
     }
 
     /**
@@ -58,28 +59,32 @@ class AclService
         $roleRepository = $entityManager->getRepository('Zf2SimpleAcl\Entities\Role');
         $roles = $roleRepository->findAll();
 
-        /* @var $role \Front\Entities\Role */
+        /* @var $role \Zf2SimpleAcl\Entities\Role */
         foreach ($roles as $role) {
-            $this->acl->addRole(new Role($role), is_null($role->getParent()) ? null : new Role($role->getParent()));
+            $this->acl->addRole(new RoleRole($role),
+                                is_null($role->getParent()) ?
+                                    null :
+                                    new RoleRole($role->getParent()));
         }
 
         $userRepository = $entityManager->getRepository('Zf2SimpleAcl\Entities\User');
         $users = $userRepository->findAll();
 
-        /* @var $user \Front\Entities\User */
+        /* @var $user \Zf2SimpleAcl\Entities\User */
         foreach ($users as $user) {
-            $this->acl->addRole(new User($user), new Role($user->getRole()));
+            $this->acl->addRole(new UserRole($user), new RoleRole($user->getRole()));
         }
     }
 
     /**
-     * @param array $restrictions
+     * @param RestrictionOptionsInterface $restrictions
      * @param EntityManager $entityManager
      * @throws DomainException
      */
-    protected function initConstantRestrictions(array $restrictions, EntityManager $entityManager)
+    protected function initConstantRestrictions(RestrictionOptionsInterface $restrictions,
+                                                EntityManager $entityManager)
     {
-        foreach ($restrictions as $resource=>$roles) {
+        foreach ($restrictions->getRestrictions() as $resource=>$roles) {
             $aclResource = new GenericResource($resource);
 
             if (!$this->acl->hasResource($aclResource)) {
@@ -91,7 +96,7 @@ class AclService
                 if (is_null($roleEntity)) {
                     throw new DomainException('Could not find defined role id '.$role);
                 }
-                $aclRole = new Role($roleEntity);
+                $aclRole = new RoleRole($roleEntity);
                 $this->acl->{$allow ? 'allow': 'deny'}($aclRole, $aclResource);
             }
         }
@@ -112,19 +117,19 @@ class AclService
     {
         if ($this->authService->hasIdentity()) {
             $user = $this->authService->getIdentity();
-            return new Role($user->getRole(), $user);
+            return new RoleRole($user->getRole(), $user);
         }
-        return new Role($this->defaultRoleEntity);
+        return new RoleRole($this->defaultRoleEntity);
     }
 
     /**
-     * @return Zf2SimpleAcl\Role\User|NULL
+     * @return UserRole
      */
-    protected function getAclRoleUser()
+    protected function getAclUser()
     {
         if ($this->authService->hasIdentity()) {
             $user = $this->authService->getIdentity();
-            return new User($user);
+            return new UserRole($user);
         }
         return null;
     }
@@ -138,8 +143,8 @@ class AclService
     {
         if ($this->acl->hasResource($resource) && $this->acl->hasRole($this->getAclRole())) {
             return $this->acl->isAllowed($this->getAclRole(), $resource, $privilege) ||
-                   !is_null($this->getAclRoleUser()) &&
-                   $this->acl->isAllowed($this->getAclRoleUser(), $resource, $privilege);
+                   !is_null($this->getAclUser()) &&
+                   $this->acl->isAllowed($this->getAclUser(), $resource, $privilege);
         } else {
             return false;
         }
