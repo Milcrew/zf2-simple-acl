@@ -19,9 +19,9 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
         $userEntityClass = $sm->get('zfcuser_module_options')->getUserEntityClass();
 
         $classRef = new \ReflectionClass($userEntityClass);
-        if (!$classRef->implementsInterface('Zf2SimpleAcl\Entity\UserInterface')) {
+        if (!$classRef->implementsInterface('Zf2SimpleAcl\Entities\UserInterface')) {
             throw new \InvalidArgumentException($userEntityClass.
-                                                ' must implement Zf2SimpleAcl\Entity\UserInterface');
+                                                ' must implement Zf2SimpleAcl\Entities\UserInterface');
         }
 
         $di->instanceManager()->setParameters('Zf2SimpleAcl\Options\ModuleOptions',

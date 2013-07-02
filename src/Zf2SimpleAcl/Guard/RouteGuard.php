@@ -93,12 +93,12 @@ class RouteGuard implements ListenerAggregateInterface
             if (!$this->aclService->isAllowed(null, 'route/'.$route)) {
                 $event->setError(static::ERROR_UNAUTHENTICATE);
                 $application->getEventManager()->trigger(MvcEvent::EVENT_DISPATCH_ERROR, $event);
-                return;
             }
+            return;
         } else {
             $identity = $this->authService->getIdentity();
             if (!$identity instanceof UserInterface) {
-                throw new \InvalidArgumentException('Identity must implement Zf2SimpleAcl\Entity\UserInterface');
+                throw new \InvalidArgumentException('Identity must implement Zf2SimpleAcl\Entities\UserInterface');
             }
             if (!$this->aclService->isAllowed($this->authService->getIdentity()->getRole(), 'route/'.$route)) {
                 return;
