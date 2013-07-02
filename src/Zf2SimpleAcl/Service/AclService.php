@@ -4,7 +4,6 @@ namespace Zf2SimpleAcl\Service;
 use Doctrine\ORM\EntityManager;
 use Zend\Permissions\Acl\AclInterface;
 use Zend\Permissions\Acl\Resource\GenericResource;
-use Zend\Authentication\AuthenticationService;
 use Zend\Permissions\Acl\Acl;
 use Zend\Permissions\Acl\Resource\ResourceInterface;
 use Zend\Permissions\Acl\Role\RoleInterface;
@@ -12,7 +11,6 @@ use Zf2SimpleAcl\Options\ModuleOptionsInterface;
 use Zf2SimpleAcl\Options\RestrictionOptionsInterface;
 use Zf2SimpleAcl\Service\Exception\DomainException;
 use Zf2SimpleAcl\Role\RoleRole;
-use Zf2SimpleAcl\Role\UserRole;
 
 class AclService implements AclInterface
 {
@@ -22,23 +20,15 @@ class AclService implements AclInterface
     private $acl = null;
 
     /**
-     * @var AuthenticationService
-     */
-    private $authService = null;
-
-    /**
      * @var \Zf2SimpleAcl\Options\ModuleOptionsInterface
      */
     private $moduleOptions = null;
 
     /**
-     * @param AuthenticationService $authService
      * @param ModuleOptionsInterface $moduleOptions
      */
-    public function __construct(AuthenticationService $authService,
-                                ModuleOptionsInterface $moduleOptions)
+    public function __construct(ModuleOptionsInterface $moduleOptions)
     {
-        $this->authService = $authService;
         $this->moduleOptions = $moduleOptions;
     }
 

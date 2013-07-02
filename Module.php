@@ -5,7 +5,9 @@ use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
+use Zf2SimpleAcl\Guard\RouteGuard;
 use Zf2SimpleAcl\Options\ModuleOptions;
+use Zf2SimpleAcl\View\Strategy\RedirectionStrategy;
 
 class Module implements AutoloaderProviderInterface, ConfigProviderInterface, ServiceProviderInterface
 {
@@ -13,9 +15,6 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
     {
         /* @var $sm \Zend\ServiceManager\ServiceManager */
         $sm = $e->getApplication()->getServiceManager();
-
-        /* @var $di \Zend\Di\Di */
-        $di = $sm->get('di');
 
         $userEntityClass = $sm->get('zfcuser_module_options')->getUserEntityClass();
         $classRef = new \ReflectionClass($userEntityClass);
@@ -25,14 +24,10 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
             ' must implement Zf2SimpleAcl\Entities\UserInterface');
         }
 
-        $di->instanceManager()->setTypePreference('Zf2SimpleAcl\Options\ModuleOptionsInterface',
-                                                  array($sm->get('Zf2SimpleAcl\Options\ModuleOptions')))
-                              ->setTypePreference('Zf2SimpleAcl\Options\RedirectRouteOptionsInterface',
-                                                  array($sm->get('Zf2SimpleAcl\Options\ModuleOptions')));
-
         $eventManager = $e->getApplication()->getEventManager();
-        $eventManager->attach($di->get('Zf2SimpleAcl\Guard\RouteGuard'));
-        $eventManager->attach($di->get('Zf2SimpleAcl\View\Strategy\RedirectionStrategy'));
+        $eventManager->attach(new RouteGuard($sm->get('zf2simpleacl_acl'),
+                                             $sm->get('zfcuserauthservice')));
+        $eventManager->attach(new RedirectionStrategy($sm->get('zf2simpleacl_module_options')));
     }
 
     public function getConfig()
@@ -45,11 +40,15 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
         return array(
             'factories' => array(
                 'translator' => 'Zend\I18n\Translator\TranslatorServiceFactory',
-                'Zf2SimpleAcl\Options\ModuleOptions' => function ($sm) {
+                'zf2simpleacl_module_options' => function ($sm) {
                     $config = $sm->get('config');
                     return new \Zf2SimpleAcl\Options\ModuleOptions(isset($config['zf2simpleacl']) ?
                                                                          $config['zf2simpleacl'] :
                                                                          array());
+                },
+
+                'zf2simpleacl_acl' => function ($sm) {
+                    return new \Zf2SimpleAcl\Service\AclService($sm->get('zf2simpleacl_module_options'));
                 }
             )
         );
