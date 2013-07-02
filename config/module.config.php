@@ -22,21 +22,6 @@ return array(
         )
     ),
 
-    'doctrine' => array(
-        'driver' => array(
-            'front_driver' => array(
-                'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
-                'cache' => 'array',
-                'paths' => array(__DIR__ . '/../src/Zf2SimpleAcl/Entities')
-            ),
-            'orm_default' => array(
-                'drivers' => array(
-                    'Zf2SimpleAcl\Entities' => 'front_driver'
-                )
-            )
-        )
-    ),
-
     'view_manager' => array(
         'display_not_found_reason' => true,
         'display_exceptions'       => true,
