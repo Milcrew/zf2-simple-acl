@@ -1,4 +1,4 @@
-project-acl
+ZF2 Simple Acl
 ===========
 
 project-acl
