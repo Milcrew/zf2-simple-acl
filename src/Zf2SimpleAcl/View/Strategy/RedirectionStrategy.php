@@ -6,18 +6,24 @@ use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
 use Zf2SimpleAcl\Guard\RouteGuard;
+use Zf2SimpleAcl\Options\RedirectRouteOptionsInterface;
 
 class RedirectionStrategy implements ListenerAggregateInterface
 {
     /**
-     * @var string route to be used to handle redirects
-     */
-    protected $redirectRoute = 'main';
-
-    /**
      * @var \Zend\Stdlib\CallbackHandler[]
      */
     protected $listeners = array();
+
+    protected $routeOptions = null;
+
+    /**
+     * @param RedirectRouteOptionsInterface $routeOptions
+     */
+    public function __construct(RedirectRouteOptionsInterface $routeOptions)
+    {
+        $this->routeOptions = $routeOptions;
+    }
 
     /**
      * {@inheritDoc}
@@ -59,7 +65,7 @@ class RedirectionStrategy implements ListenerAggregateInterface
         ) {
             return;
         }
-        $url = $router->assemble(array(), array('name' => $this->redirectRoute));
+        $url = $router->assemble(array(), array('name' => $this->routeOptions->getRedirectRoute()));
 
         $response = $response ?: new Response();
 
