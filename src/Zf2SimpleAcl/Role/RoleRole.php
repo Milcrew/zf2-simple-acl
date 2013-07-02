@@ -7,10 +7,10 @@ use Zf2SimpleAcl\Entities\RoleInterface;
 class RoleRole extends GenericRole
 {
     /**
-     * @param RoleInterface $role
+     * @param number $roleId
      */
-    public function __construct(RoleInterface $role)
+    public function __construct($roleId)
     {
-        $this->roleId = $role->getId();
+        $this->roleId = $roleId;
     }
 }

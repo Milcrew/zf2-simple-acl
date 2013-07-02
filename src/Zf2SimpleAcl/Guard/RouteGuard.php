@@ -1,11 +1,14 @@
 <?php
 namespace Zf2SimpleAcl\Guard;
 
+use Zend\Server\Exception\InvalidArgumentException;
+use Zf2SimpleAcl\Entities\UserInterface;
 use Zf2SimpleAcl\Service\AclService;
 use Zend\Authentication\AuthenticationService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Mvc\MvcEvent;
+use Zf2SimpleAcl\Service\Exception\DomainException;
 
 class RouteGuard implements ListenerAggregateInterface
 {
@@ -86,23 +89,26 @@ class RouteGuard implements ListenerAggregateInterface
 
         /* @var $application \Zend\Mvc\ApplicationInterface */
         $application = $event->getApplication();
-
-        if ($this->aclService->isAllowed('route/'.$route)) {
-            return;
-        }
-
-
-        /* @var $authService \Zend\Authentication\AuthenticationService */
-        $authService = $application->getServiceManager()->get('zfcuserauthservice');
-
-        if ($authService->hasIdentity()) {
-            $event->setError(static::ERROR);
-            $event->setParam('route', $route);
-            $event->setParam('identity', $authService->getIdentity());
-            $application->getEventManager()->trigger(MvcEvent::EVENT_DISPATCH_ERROR, $event);
+        if (!$this->authService->hasIdentity()) {
+            if (!$this->aclService->isAllowed(null, 'route/'.$route)) {
+                $event->setError(static::ERROR_UNAUTHENTICATE);
+                $application->getEventManager()->trigger(MvcEvent::EVENT_DISPATCH_ERROR, $event);
+                return;
+            }
         } else {
-            $event->setError(static::ERROR_UNAUTHENTICATE);
-            $application->getEventManager()->trigger(MvcEvent::EVENT_DISPATCH_ERROR, $event);
+            $identity = $this->authService->getIdentity();
+            if (!$identity instanceof UserInterface) {
+                throw new \InvalidArgumentException('Identity must implement Zf2SimpleAcl\Entity\UserInterface');
+            }
+            if (!$this->aclService->isAllowed($this->authService->getIdentity()->getRole(), 'route/'.$route)) {
+                return;
+            }
         }
+
+        $event->setError(static::ERROR);
+        $event->setParam('route', $route);
+        $event->setParam('identity', $this->authService->getIdentity());
+
+        $application->getEventManager()->trigger(MvcEvent::EVENT_DISPATCH_ERROR, $event);
     }
 }

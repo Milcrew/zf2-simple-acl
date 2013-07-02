@@ -15,17 +15,24 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
 
         /* @var $di \Zend\Di\Di */
         $di = $sm->get('di');
-        $di->instanceManager()->addSharedInstance($sm->get('Doctrine\ORM\EntityManager'),
-                                                  'Doctrine\ORM\EntityManager');
-
         $config = $sm->get('config');
+        $userEntityClass = $sm->get('zfcuser_module_options')->getUserEntityClass();
+
+        $classRef = new \ReflectionClass($userEntityClass);
+        if (!$classRef->implementsInterface('Zf2SimpleAcl\Entity\UserInterface')) {
+            throw new \InvalidArgumentException($userEntityClass.
+                                                ' must implement Zf2SimpleAcl\Entity\UserInterface');
+        }
+
         $di->instanceManager()->setParameters('Zf2SimpleAcl\Options\ModuleOptions',
-                                              isset($config['zf2simpleacl']) ? $config['zf2simpleacl'] : array());
-        $di->instanceManager()->setTypePreference('Zf2SimpleAcl\Options\RestrictionOptionsInterface',
+                                              isset($config['zf2simpleacl']) ?
+                                                  $config['zf2simpleacl'] :
+                                                  array());
+
+        $di->instanceManager()->setTypePreference('Zf2SimpleAcl\Options\ModuleOptionsInterface',
                                                   array('Zf2SimpleAcl\Options\ModuleOptions'));
 
         $eventManager = $e->getApplication()->getEventManager();
-
         $eventManager->attach($di->get('Zf2SimpleAcl\Guard\RouteGuard'));
         $eventManager->attach($di->get('Zf2SimpleAcl\View\Strategy\RedirectionStrategy'));
     }
@@ -38,25 +45,8 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
     public function getServiceConfig()
     {
         return array(
-            'aliases' => array(
-                'zfcuser_doctrine_em' => 'doctrine.entitymanager.orm_default',
-            ),
             'factories' => array(
-                'translator' => 'Zend\I18n\Translator\TranslatorServiceFactory',
-
-                'zfcuser_module_options' => function ($sm) {
-                    $config = $sm->get('Configuration');
-                    return new \Zf2SimpleAcl\Options\ZfcUserOptions(isset($config['zfcuser']) ?
-                                                                          $config['zfcuser'] :
-                                                                          array());
-                },
-
-                'zfcuser_user_mapper' => function ($sm) {
-                    return new \Zf2SimpleAcl\Mapper\User(
-                        $sm->get('zfcuser_doctrine_em'),
-                        $sm->get('zfcuser_module_options')
-                    );
-                }
+                'translator' => 'Zend\I18n\Translator\TranslatorServiceFactory'
             )
         );
     }
