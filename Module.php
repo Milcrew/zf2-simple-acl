@@ -38,8 +38,25 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
     public function getServiceConfig()
     {
         return array(
+            'aliases' => array(
+                'zfcuser_doctrine_em' => 'doctrine.entitymanager.orm_default',
+            ),
             'factories' => array(
-                'translator' => 'Zend\I18n\Translator\TranslatorServiceFactory'
+                'translator' => 'Zend\I18n\Translator\TranslatorServiceFactory',
+
+                'zfcuser_module_options' => function ($sm) {
+                    $config = $sm->get('Configuration');
+                    return new \Zf2SimpleAcl\Options\ZfcUserOptions(isset($config['zfcuser']) ?
+                                                                          $config['zfcuser'] :
+                                                                          array());
+                },
+
+                'zfcuser_user_mapper' => function ($sm) {
+                    return new \Zf2SimpleAcl\Mapper\User(
+                        $sm->get('zfcuser_doctrine_em'),
+                        $sm->get('zfcuser_module_options')
+                    );
+                }
             )
         );
     }

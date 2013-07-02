@@ -10,6 +10,7 @@ return array(
 //            'route/main' => array(\Zf2SimpleAcl\Entities\Role::GUEST => true)
 //        )
 //    ),
+
     'translator' => array(
         'locale' => 'ru_RU',
         'translation_file_patterns' => array(
