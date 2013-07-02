@@ -102,7 +102,8 @@ class AclService implements AclInterface
             }
 
             if (!is_array($roles)) {
-                return $this->acl->allow(null, $aclResource);
+                $this->acl->allow(null, $aclResource);
+                continue;
             }
 
             foreach ($roles as $role=>$allow) {
