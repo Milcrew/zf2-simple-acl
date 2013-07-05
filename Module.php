@@ -5,8 +5,10 @@ use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
+use Zend\Mvc\Router\RoutePluginManager;
 use Zf2SimpleAcl\Guard\RouteGuard;
 use Zf2SimpleAcl\Options\ModuleOptions;
+use Zf2SimpleAcl\View\Strategy\ForbiddenStrategy;
 use Zf2SimpleAcl\View\Strategy\RedirectionStrategy;
 
 class Module implements AutoloaderProviderInterface, ConfigProviderInterface, ServiceProviderInterface
@@ -27,12 +29,30 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
         $eventManager = $e->getApplication()->getEventManager();
         $eventManager->attach(new RouteGuard($sm->get('zf2simpleacl_acl'),
                                              $sm->get('zfcuserauthservice')));
+
         $eventManager->attach(new RedirectionStrategy($sm->get('zf2simpleacl_module_options')));
+        $eventManager->attach(new ForbiddenStrategy());
+
+        $pm = $sm->get('router')->getRoutePluginManager();
+
+        /**
+         * TODO: Disable this when caching support will be implemented
+         **/
+        $allowOverride = $pm->getAllowOverride();
+        $pm->setAllowOverride(true)
+           ->setInvokableClass('part', 'Zf2SimpleAcl\Mvc\Router\Http\Part')
+           ->setAllowOverride($allowOverride);
     }
 
     public function getConfig()
     {
-        return include __DIR__ . '/config/module.config.php';
+        return array(
+            'view_manager' => array(
+                'template_map' => array(
+                    'error/403'               => __DIR__ . '/view/error/403.phtml'
+                )
+            )
+        );
     }
 
     public function getServiceConfig()
@@ -48,7 +68,8 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
                 },
 
                 'zf2simpleacl_acl' => function ($sm) {
-                    return new \Zf2SimpleAcl\Service\AclService($sm->get('zf2simpleacl_module_options'));
+                    return new \Zf2SimpleAcl\Service\AclService($sm->get('zf2simpleacl_module_options'),
+                                                                $sm->get('router'));
                 }
             )
         );

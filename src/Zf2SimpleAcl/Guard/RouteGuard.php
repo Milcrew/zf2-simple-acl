@@ -1,14 +1,13 @@
 <?php
 namespace Zf2SimpleAcl\Guard;
 
-use Zend\Server\Exception\InvalidArgumentException;
 use Zf2SimpleAcl\Entities\UserInterface;
+use Zf2SimpleAcl\Resource\RouteResource;
 use Zf2SimpleAcl\Service\AclService;
 use Zend\Authentication\AuthenticationService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
 use Zend\Mvc\MvcEvent;
-use Zf2SimpleAcl\Service\Exception\DomainException;
 
 class RouteGuard implements ListenerAggregateInterface
 {
@@ -16,6 +15,7 @@ class RouteGuard implements ListenerAggregateInterface
      * Marker for invalid route errors
      */
     const ERROR = 'error-unauthorized-route';
+
     /**
      * Marker for unauthenticate users
      */
@@ -87,24 +87,28 @@ class RouteGuard implements ListenerAggregateInterface
             return;
         }
 
+        $resource = new RouteResource($route);
+
         /* @var $application \Zend\Mvc\ApplicationInterface */
         $application = $event->getApplication();
+
         if (!$this->authService->hasIdentity()) {
-            if (!$this->aclService->isAllowed(null, 'route/'.$route)) {
+            if (!$this->aclService->isAllowed(null, $resource)) {
                 $event->setError(static::ERROR_UNAUTHENTICATE);
                 $application->getEventManager()->trigger(MvcEvent::EVENT_DISPATCH_ERROR, $event);
             }
             return;
         } else {
             $identity = $this->authService->getIdentity();
+
             if (!$identity instanceof UserInterface) {
                 throw new \InvalidArgumentException('Identity must implement Zf2SimpleAcl\Entities\UserInterface');
             }
-
-            if ($this->aclService->isAllowed($this->authService->getIdentity()->getRole(), 'route/'.$route)) {
+            if ($this->aclService->isAllowed($this->authService->getIdentity()->getRole(), $resource)) {
                 return;
             }
         }
+        
 
         $event->setError(static::ERROR);
         $event->setParam('route', $route);

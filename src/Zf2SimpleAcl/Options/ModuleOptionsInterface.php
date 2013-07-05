@@ -2,6 +2,7 @@
 namespace Zf2SimpleAcl\Options;
 
 interface ModuleOptionsInterface extends
-          RestrictionOptionsInterface,
+          RouteOptionsInterface,
           RedirectRouteOptionsInterface,
-          RoleOptionsInterface {}
+          RoleOptionsInterface,
+          RestrictionStrategyOptionsInterface {}

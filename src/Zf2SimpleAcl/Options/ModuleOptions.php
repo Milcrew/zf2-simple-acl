@@ -2,8 +2,8 @@
 namespace Zf2SimpleAcl\Options;
 
 use Zend\Stdlib\AbstractOptions;
-use Zf2SimpleAcl\Entities\Role;
 use Zf2SimpleAcl\Items\RoleItem;
+use Zf2SimpleAcl\Options\Exception\InvalidArgumentException;
 
 class ModuleOptions extends AbstractOptions
     implements ModuleOptionsInterface
@@ -11,7 +11,7 @@ class ModuleOptions extends AbstractOptions
     /**
      * @var array
      */
-    protected $restrictions = array();
+    protected $routes = array();
 
     /**
      * @var RoleItem[]
@@ -22,6 +22,42 @@ class ModuleOptions extends AbstractOptions
      * @var string
      */
     protected $redirectRoute = null;
+
+    /**
+     * @var string
+     */
+    protected $restrictionStrategy = RestrictionStrategyOptionsInterface::PERMISSIVE_STRATEGY;
+
+    /**
+     * @return string
+     */
+    public function isPermissive()
+    {
+        return $this->restrictionStrategy == RestrictionStrategyOptionsInterface::PERMISSIVE_STRATEGY;
+    }
+
+    /**
+     * @return string
+     */
+    public function isStrict()
+    {
+        return $this->restrictionStrategy == RestrictionStrategyOptionsInterface::STRICT_STRATEGY;
+    }
+
+    /**
+     * @param $strategy
+     * @return $this
+     * @throws \InvalidArgumentException
+     */
+    public function setRestrictionStrategy($strategy)
+    {
+        if (!in_array($strategy, array(RestrictionStrategyOptionsInterface::PERMISSIVE_STRATEGY,
+                                       RestrictionStrategyOptionsInterface::STRICT_STRATEGY))) {
+            throw new InvalidArgumentException("Invalid restriction strategy");
+        }
+        $this->restrictionStrategy = $strategy;
+        return $this;
+    }
 
     /**
      * @return string
@@ -64,18 +100,18 @@ class ModuleOptions extends AbstractOptions
     /**
      * @return array
      */
-    public function getRestrictions()
+    public function getRoutes()
     {
-        return $this->restrictions;
+        return $this->routes;
     }
 
     /**
-     * @param array $restrictions
+     * @param array $routes
      * @return ModuleOptions
      */
-    public function setRestrictions(array $restrictions)
+    public function setRoutes(array $routes)
     {
-        $this->restrictions = $restrictions;
+        $this->routes = $routes;
         return $this;
     }
 }

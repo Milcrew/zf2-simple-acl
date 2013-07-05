@@ -1,0 +1,30 @@
+<?php
+return array(
+    'zf2simpleacl' => array(
+        /**
+         * This route will be used by RedirectionStrategy for redirect unauthorized users,
+         * who access to the forbidden page.
+         *
+         * By default: User will get only forbidden page and will not be redirected.
+         */
+        //'redirect_route' => 'main/admin/user/login',
+
+        /**
+         * It is the define default behavior for acl. If value 'permissive' it will mean
+         * "allow all from all" so then you will have to restrict all resources which you want to be restricted.
+         * If value 'strict' it is will mean "deny all from all" so then you will have to allow every resource which
+         * which you want to be available
+         */
+        //'restriction_strategy' => 'permissive',
+
+        /* Routes which you want to restrict */
+//        'routes' => array(
+//            'main' => array(true)
+//        ),
+
+        /* Roles which you support in your application */
+//        'roles' => array(
+//            array('name'=>'admin', 'id'=>1)
+//        )
+    )
+);

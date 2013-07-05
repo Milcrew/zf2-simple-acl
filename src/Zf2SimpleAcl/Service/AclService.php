@@ -1,14 +1,15 @@
 <?php
 namespace Zf2SimpleAcl\Service;
 
-use Doctrine\ORM\EntityManager;
+use Zend\Mvc\Router\RouteInterface;
+use Zend\Mvc\Router\SimpleRouteStack;
 use Zend\Permissions\Acl\AclInterface;
 use Zend\Permissions\Acl\Resource\GenericResource;
 use Zend\Permissions\Acl\Acl;
 use Zend\Permissions\Acl\Resource\ResourceInterface;
 use Zend\Permissions\Acl\Role\RoleInterface;
 use Zf2SimpleAcl\Options\ModuleOptionsInterface;
-use Zf2SimpleAcl\Options\RestrictionOptionsInterface;
+use Zf2SimpleAcl\Resource\RouteResource;
 use Zf2SimpleAcl\Service\Exception\DomainException;
 use Zf2SimpleAcl\Role\RoleRole;
 
@@ -17,47 +18,164 @@ class AclService implements AclInterface
     /**
      * @var \Zend\Permissions\Acl\Acl
      */
-    private $acl = null;
+    protected $acl = null;
 
     /**
      * @var \Zf2SimpleAcl\Options\ModuleOptionsInterface
      */
-    private $moduleOptions = null;
+    protected $moduleOptions = null;
+
+    /**
+     * @var SimpleRouteStack
+     */
+    protected $routeStack = null;
 
     /**
      * @param ModuleOptionsInterface $moduleOptions
+     * @param SimpleRouteStack $routeStack
      */
-    public function __construct(ModuleOptionsInterface $moduleOptions)
+    public function __construct(ModuleOptionsInterface $moduleOptions, SimpleRouteStack $routeStack)
     {
         $this->moduleOptions = $moduleOptions;
+        $this->routeStack = $routeStack;
+    }
+
+    protected function init()
+    {
+        /**
+         * TODO: Implement cache for production
+         */
+        $acl = new Acl();
+        $acl->{$this->moduleOptions->isStrict() ? 'deny' : 'allow'}(null, null, null);
+
+        $this->initRoles($acl);
+        $this->initRouteRestrictions($acl);
+
+        $this->acl = $acl;
     }
 
     /**
-     *
+     * @param Acl $acl
      */
-    protected function init()
+    protected function initRoles(Acl $acl)
     {
-        $this->initAcl();
-        $this->initConstantRestrictions();
-    }
-
-    protected function initAcl()
-    {
-        /*
-         * TODO: Implement caching for acl object
-        */
-        $this->acl = new \Zend\Permissions\Acl\Acl();
-        $this->acl->deny(null, null, null);
-
         $roles = $this->moduleOptions->getRoles();
 
         foreach ($roles as $role) {
-            $this->acl->addRole(new RoleRole($role->getId()),
-                                is_null($role->getParent()) ?
-                                    null :
-                                    new RoleRole($role->getParent()));
+            $acl->addRole(new RoleRole($role->getId()),
+                            is_null($role->getParent()) ?
+                                null :
+                                new RoleRole($role->getParent()));
         }
     }
+
+    /**
+     * @param mixed $route
+     * @param mixed $roles
+     */
+    protected function getResource($route, $roles)
+    {
+        $aclResource = null;
+
+        if (!is_array($roles)) {
+            $aclResource = new RouteResource($roles);
+        } else if (is_array($roles) && is_string($route)) {
+            $aclResource = new RouteResource($route);
+        }
+
+        return $aclResource;
+    }
+
+    /**
+     * @param Acl $acl
+     * @param $restriction
+     * @param RoleRole $role
+     * @param RouteResource $resource
+     */
+    protected function restrictRoute(Acl $acl, $restriction, RoleRole $role = null, RouteResource $resource = null)
+    {
+        if (is_null($resource)) {
+            return $acl->{$restriction}($role, $resource);
+        }
+
+        $func = function ($route, array $names) use (&$func, $acl, $resource, $restriction, $role) {
+            if (!count($names)) {
+                throw new \DomainException("Names could not be empty");
+            }
+
+            if (!$route instanceof SimpleRouteStack) {
+                if ($route instanceof \Iterator) {
+                    $routes = $route;
+                } else {
+                    return;
+                }
+            } else {
+                $routes = $route->getRoutes();
+            }
+
+            foreach ($routes as $name => $route) {
+                $routeNames = array_merge($names, array($name));
+                $parentResource = new RouteResource(join('/', $names));
+                $childResource = new RouteResource(join('/', $routeNames));
+
+                if (!$acl->hasResource($childResource)) {
+                    $acl->addResource($childResource, $parentResource);
+                }
+
+                if ($acl->hasResource($resource) &&
+                    $acl->inheritsResource($childResource, $resource)) {
+                    $acl->{$restriction ? 'allow' : 'deny'}($role, $childResource);
+                }
+
+                if ( $route instanceof SimpleRouteStack ) {
+                    $func($route->getRoutes(), $routeNames);
+                }
+            }
+        };
+
+        $firstPart = $resource->getFirstPart();
+        if (!$acl->hasResource($firstPart)) {
+            $acl->addResource(new RouteResource($firstPart), null);
+        }
+
+        $func($this->routeStack->getRoute($firstPart), array($firstPart));
+        return $acl->{$restriction ? 'allow' : 'deny'}($role, $resource);
+    }
+
+    /**
+     * @param Acl $acl
+     * @throws Exception\DomainException
+     */
+    protected function initRouteRestrictions(Acl $acl)
+    {
+        foreach ($this->moduleOptions->getRoutes() as $route=>$roles) {
+            if (!is_array($roles)) {
+                $this->restrictRoute($acl, 'allow', null, new RouteResource($roles));
+                continue;
+            }
+
+            if (!is_numeric($route)) {
+                $aclResource = new RouteResource($route);
+            } else {
+                $aclResource = null;
+            }
+            foreach ($roles as $role=>$allow) {
+                if (is_numeric($role)) {
+                    $aclRole = null;
+                } else {
+                    $aclRole = $this->findRole($role);
+                    if (is_null($aclRole)) {
+                        throw new DomainException('Could not find defined role id='.$role.'.
+                                                   Please make sure that you have role with current id in your
+                                                   database inside role table');
+                    }
+                }
+                
+                $this->restrictRoute($acl, $allow , $aclRole, $aclResource);
+            }
+        }
+    }
+
 
     /**
      * @param string|number $roleIdentifier
@@ -71,42 +189,6 @@ class AclService implements AclInterface
             }
         }
         return null;
-    }
-
-    /**
-     * @param RestrictionOptionsInterface $restrictions
-     * @param EntityManager $entityManager
-     * @throws DomainException
-     */
-    protected function initConstantRestrictions()
-    {
-        foreach ($this->moduleOptions->getRestrictions() as $resource=>$roles) {
-            if (!is_array($roles)) {
-                $aclResource = new GenericResource($roles);
-            } else {
-                $aclResource = new GenericResource($resource);
-            }
-
-            if (!$this->acl->hasResource($aclResource)) {
-                $this->acl->addResource($aclResource, null);
-            }
-
-            if (!is_array($roles)) {
-                $this->acl->allow(null, $aclResource);
-                continue;
-            }
-
-            foreach ($roles as $role=>$allow) {
-                $aclRole = $this->findRole($role);
-                if (is_null($aclRole)) {
-
-                    throw new DomainException('Could not find defined role id='.$role.'.
-                                               Please make sure that you have role with current id in your
-                                               database inside role table');
-                }
-                $this->acl->{$allow ? 'allow': 'deny'}($aclRole, $aclResource);
-            }
-        }
     }
 
     /**
