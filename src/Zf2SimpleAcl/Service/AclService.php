@@ -1,10 +1,8 @@
 <?php
 namespace Zf2SimpleAcl\Service;
 
-use Zend\Mvc\Router\RouteInterface;
 use Zend\Mvc\Router\SimpleRouteStack;
 use Zend\Permissions\Acl\AclInterface;
-use Zend\Permissions\Acl\Resource\GenericResource;
 use Zend\Permissions\Acl\Acl;
 use Zend\Permissions\Acl\Resource\ResourceInterface;
 use Zend\Permissions\Acl\Role\RoleInterface;
@@ -46,7 +44,7 @@ class AclService implements AclInterface
          * TODO: Implement cache for production
          */
         $acl = new Acl();
-        $acl->{$this->moduleOptions->isStrict() ? 'deny' : 'allow'}(null, null, null);
+        $acl->{$this->moduleOptions->isPermissive() ? 'allow' : 'deny'}(null, null, null);
 
         $this->initRoles($acl);
         $this->initRouteRestrictions($acl);
@@ -200,6 +198,7 @@ class AclService implements AclInterface
         if (is_null($this->acl)) {
             $this->init();
         }
+
         return $this->acl->hasResource($resource);
     }
 
@@ -221,7 +220,15 @@ class AclService implements AclInterface
             $roleEntity = $role;
         }
 
-        if ($this->acl->hasResource($resource) && ($this->acl->hasRole($roleEntity) || is_null($roleEntity))) {
+        if (!$this->hasResource($resource)) {
+            if ($this->moduleOptions->isPermissive()) {
+                $resource = null;
+            } else {
+                return false;
+            }
+        }
+
+        if (($this->acl->hasRole($roleEntity) || is_null($roleEntity))) {
             return $this->acl->isAllowed($roleEntity, $resource, $privilege);
         } else {
             return false;
