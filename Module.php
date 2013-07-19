@@ -32,16 +32,6 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
 
         $eventManager->attach(new RedirectionStrategy($sm->get('zf2simpleacl_module_options')));
         $eventManager->attach(new ForbiddenStrategy());
-
-        $pm = $sm->get('router')->getRoutePluginManager();
-
-        /**
-         * TODO: Disable this when caching support will be implemented
-         **/
-        $allowOverride = $pm->getAllowOverride();
-        $pm->setAllowOverride(true)
-           ->setInvokableClass('part', 'Zf2SimpleAcl\Mvc\Router\Http\Part')
-           ->setAllowOverride($allowOverride);
     }
 
     public function getConfig()
@@ -70,7 +60,9 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
                 'zf2simpleacl_acl' => function ($sm) {
                     return new \Zf2SimpleAcl\Service\AclService($sm->get('zf2simpleacl_module_options'),
                                                                 $sm->get('router'));
-                }
+                },
+                
+                'RoutePluginManager' => 'Zf2SimpleAcl\Mvc\Service\RoutePluginManagerFactory'
             )
         );
     }
