@@ -1,5 +1,5 @@
 <?php
-namespace Zf2SimpleAcl\Entities;
+namespace Zf2SimpleAcl\Entity;
 
 interface UserInterface
 {

@@ -2,7 +2,6 @@
 namespace Zf2SimpleAcl\Role;
 
 use Zend\Permissions\Acl\Role\GenericRole;
-use Zf2SimpleAcl\Entities\RoleInterface;
 
 class RoleRole extends GenericRole
 {

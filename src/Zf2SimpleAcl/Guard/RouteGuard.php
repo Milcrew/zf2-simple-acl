@@ -1,7 +1,7 @@
 <?php
 namespace Zf2SimpleAcl\Guard;
 
-use Zf2SimpleAcl\Entities\UserInterface;
+use Zf2SimpleAcl\Entity\UserInterface;
 use Zf2SimpleAcl\Resource\RouteResource;
 use Zf2SimpleAcl\Service\AclService;
 use Zend\Authentication\AuthenticationService;
@@ -102,7 +102,7 @@ class RouteGuard implements ListenerAggregateInterface
             $identity = $this->authService->getIdentity();
 
             if (!$identity instanceof UserInterface) {
-                throw new \InvalidArgumentException('Identity must implement Zf2SimpleAcl\Entities\UserInterface');
+                throw new \InvalidArgumentException('Identity must implement Zf2SimpleAcl\Entity\UserInterface');
             }
             if ($this->aclService->isAllowed($this->authService->getIdentity()->getRole(), $resource)) {
                 return;
