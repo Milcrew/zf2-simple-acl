@@ -1,6 +1,7 @@
 <?php
 namespace Zf2SimpleAcl\Guard;
 
+use Zf2SimpleAcl\Authentication\AuthenticationServiceInterface;
 use Zf2SimpleAcl\Entity\UserInterface;
 use Zf2SimpleAcl\Resource\RouteResource;
 use Zf2SimpleAcl\Service\AclService;
@@ -32,7 +33,7 @@ class RouteGuard implements ListenerAggregateInterface
     protected $aclService = null;
 
     /**
-     * @var AuthenticationService
+     * @var AuthenticationServiceInterface
      */
     protected $authService = null;
 
@@ -40,7 +41,7 @@ class RouteGuard implements ListenerAggregateInterface
      * @param AclService $aclService
      * @param AuthenticationService $authService
      */
-    public function __construct(AclService $aclService, AuthenticationService $authService)
+    public function __construct(AclService $aclService, AuthenticationServiceInterface $authService)
     {
         $this->aclService = $aclService;
         $this->authService = $authService;
@@ -104,11 +105,11 @@ class RouteGuard implements ListenerAggregateInterface
             if (!$identity instanceof UserInterface) {
                 throw new \InvalidArgumentException('Identity must implement Zf2SimpleAcl\Entity\UserInterface');
             }
+
             if ($this->aclService->isAllowed($this->authService->getIdentity()->getRole(), $resource)) {
                 return;
             }
         }
-        
 
         $event->setError(static::ERROR);
         $event->setParam('route', $route);

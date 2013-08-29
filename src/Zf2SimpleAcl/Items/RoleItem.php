@@ -3,6 +3,8 @@ namespace Zf2SimpleAcl\Items;
 
 class RoleItem
 {
+    const TYPE_GENERIC = 'generic';
+
     /**
      * @var array
      */
@@ -21,6 +23,10 @@ class RoleItem
             throw new \InvalidArgumentException("Name for RoleOption is required");
         }
 
+        if (!array_key_exists('type', $data)) {
+            $data['type'] = self::TYPE_GENERIC;
+        }
+
         $this->data = $data;
     }
 
@@ -30,6 +36,14 @@ class RoleItem
     public function getId()
     {
         return $this->data['id'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->data['type'];
     }
 
     /**

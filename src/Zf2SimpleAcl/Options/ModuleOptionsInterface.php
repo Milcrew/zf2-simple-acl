@@ -5,4 +5,5 @@ interface ModuleOptionsInterface extends
           RouteOptionsInterface,
           RedirectRouteOptionsInterface,
           RoleOptionsInterface,
-          RestrictionStrategyOptionsInterface {}
+          RestrictionStrategyOptionsInterface,
+          RecognizerOptionsInterface {}

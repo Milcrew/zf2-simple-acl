@@ -19,6 +19,11 @@ class ModuleOptions extends AbstractOptions
     protected $roles = array();
 
     /**
+     * @var array
+     */
+    protected $recognizers = array();
+
+    /**
      * @var string
      */
     protected $redirectRoute = null;
@@ -74,6 +79,23 @@ class ModuleOptions extends AbstractOptions
     public function setRedirectRoute($redirectRoute)
     {
         $this->redirectRoute = $redirectRoute;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRecognizers()
+    {
+        return $this->recognizers;
+    }
+
+    /**
+     * @return ModuleOptions
+     */
+    public function setRecognizers(array $recognizers)
+    {
+        $this->recognizers = $recognizers;
         return $this;
     }
 

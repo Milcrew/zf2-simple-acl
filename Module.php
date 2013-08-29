@@ -1,11 +1,14 @@
 <?php
 namespace Zf2SimpleAcl;
 
+use Zf2SimpleAcl\Authentication\AuthenticationService;
 use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\Mvc\MvcEvent;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
-use Zend\Mvc\Router\RoutePluginManager;
+use Zf2SimpleAcl\Authentication\AuthenticationAggregator;
+use Zf2SimpleAcl\Authentication\Recognizer\CronRecognizerService;
+use Zf2SimpleAcl\Exception\RuntimeException;
 use Zf2SimpleAcl\Guard\RouteGuard;
 use Zf2SimpleAcl\Options\ModuleOptions;
 use Zf2SimpleAcl\View\Strategy\ForbiddenStrategy;
@@ -27,8 +30,29 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
         }
 
         $eventManager = $e->getApplication()->getEventManager();
+
+
+        $recognizers = $sm->get('zf2simpleacl_module_options')->getRecognizers();
+
+        $authService = $sm->get('zfcuserauthservice');
+        if (!empty($recognizers) && count($recognizers)) {
+            $authService = new AuthenticationAggregator();
+            $authService->addService(new AuthenticationService($sm->get('zfcuserauthservice')));
+
+            foreach ($recognizers as $recognizer) {
+                if (!($sm->has($recognizer))) {
+                    if (!($sm->has('zf2simpleacl_recognizer_'.$recognizer))) {
+                        throw new RuntimeException("Could not find recognizer service with name
+                                                    [$recognizer] nor with [zf2simpleacl_recognizer_$recognizer]");
+                    } else {
+                        $recognizer = 'zf2simpleacl_recognizer_'.$recognizer;
+                    }
+                }
+                $authService->addService($sm->get($recognizer));
+            }
+        }
         $eventManager->attach(new RouteGuard($sm->get('zf2simpleacl_acl'),
-                                             $sm->get('zfcuserauthservice')));
+                                             $authService));
 
         $eventManager->attach(new RedirectionStrategy($sm->get('zf2simpleacl_module_options')));
         $eventManager->attach(new ForbiddenStrategy());
@@ -60,6 +84,11 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
                 'zf2simpleacl_acl' => function ($sm) {
                     return new \Zf2SimpleAcl\Service\AclService($sm->get('zf2simpleacl_module_options'),
                                                                 $sm->get('router'));
+                },
+
+                'zf2simpleacl_recognizer_cron' => function ($sm) {
+                    return new \Zf2SimpleAcl\Authentication\Recognizer\CronRecognizerService(
+                                        $sm->get('zf2simpleacl_module_options'));
                 },
                 
                 'RoutePluginManager' => 'Zf2SimpleAcl\Mvc\Service\RoutePluginManagerFactory'
