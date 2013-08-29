@@ -7,7 +7,13 @@ return array(
          *
          * By default: User will get only forbidden page and will not be redirected.
          */
-        //'redirect_route' => 'main/admin/user/login',
+        'redirect_route' => 'main/admin/user/login',
+
+        /**
+         * Recognizers should be defined if you want the special
+         * authorization process for some of role types.
+         **/
+        'recognizers' => array('cron'),
 
         /**
          * It is the define default behavior for acl. If value 'permissive' it will mean
@@ -15,16 +21,16 @@ return array(
          * If value 'strict' it is will mean "deny all from all" so then you will have to allow every resource which
          * which you want to be available
          */
-        //'restriction_strategy' => 'permissive',
+        'restriction_strategy' => 'permissive',
 
         /* Routes which you want to restrict */
-//        'routes' => array(
-//            'main' => array(true)
-//        ),
+        'routes' => array(
+            'main' => array(true)
+        ),
 
         /* Roles which you support in your application */
-//        'roles' => array(
-//            array('name'=>'admin', 'id'=>1)
-//        )
+        'roles' => array(
+            array('name'=>'admin', 'id'=>1)
+        )
     )
 );

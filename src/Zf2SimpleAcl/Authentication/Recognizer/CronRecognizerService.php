@@ -38,7 +38,11 @@ class CronRecognizerService implements AuthenticationServiceInterface
     public function hasIdentity()
     {
         if ($_SERVER['SERVER_ADDR'] == $_SERVER['REMOTE_ADDR']) {
-            return true;
+            if (strpos($_SERVER['HTTP_USER_AGENT'], 'Wget/') !== false) {
+                return true;
+            } else if (strpos($_SERVER['HTTP_USER_AGENT'], 'Lynx/') !== false) {
+                return true;
+            }
         }
         return false;
     }
