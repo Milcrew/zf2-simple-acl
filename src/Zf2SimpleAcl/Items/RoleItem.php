@@ -23,8 +23,8 @@ class RoleItem
             throw new \InvalidArgumentException("Name for RoleOption is required");
         }
 
-        if (!array_key_exists('type', $data)) {
-            $data['type'] = self::TYPE_GENERIC;
+        if (!array_key_exists('data', $data) || !array_key_exists('type', $data['data'])) {
+            $data['data']['type'] = self::TYPE_GENERIC;
         }
 
         $this->data = $data;
@@ -39,11 +39,11 @@ class RoleItem
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getType()
+    public function getData()
     {
-        return $this->data['type'];
+        return $this->data['data'];
     }
 
     /**

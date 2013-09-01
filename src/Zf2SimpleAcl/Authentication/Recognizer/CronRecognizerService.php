@@ -16,13 +16,25 @@ class CronRecognizerService implements AuthenticationServiceInterface
     protected $role = null;
 
     /**
+     * @var string
+     */
+    protected $token = '';
+
+    /**
      * @param AuthenticationService $authService
      */
     public function __construct(RoleOptionsInterface $options)
     {
         foreach ($options->getRoles() as $role) {
-            if ($role->getType() == 'cron') {
+            $data = $role->getData();
+
+            if ($data['type'] == 'cron') {
                 $this->role = $role;
+                if (!array_key_exists('token', $data)) {
+                    throw new Exception\RuntimeException("Authorization token for the 'cron' recognizer must be defined");
+                }
+                $this->token = $data['token'];
+                break;
             }
         }
 
@@ -37,7 +49,7 @@ class CronRecognizerService implements AuthenticationServiceInterface
      */
     public function hasIdentity()
     {
-        if ($_SERVER['SERVER_ADDR'] == $_SERVER['REMOTE_ADDR']) {
+        if (array_key_exists('cron', $_COOKIE) && $_COOKIE['cron'] == $this->token) {
             if (strpos($_SERVER['HTTP_USER_AGENT'], 'Wget/') !== false) {
                 return true;
             } else if (strpos($_SERVER['HTTP_USER_AGENT'], 'Lynx/') !== false) {

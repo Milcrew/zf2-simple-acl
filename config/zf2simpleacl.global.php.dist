@@ -29,8 +29,15 @@ return array(
         ),
 
         /* Roles which you support in your application */
-        'roles' => array(
-            array('name'=>'admin', 'id'=>1)
-        )
+        'roles' => array(array('name'=>'admin', 'id'=>1),
+                         array('name'=>'cron',
+                               'id'=>2,
+                               'data' => array(
+                                   'type'=>'cron',
+                                   // It is authorization token, value will be compared with
+                                   // token inside $_COOKIE['cron'] and will decide that this is
+                                   // cron role.
+                                   'token'=>'a43b4caa46fb39a1d48b89e25f0e79df'
+                        )))
     )
 );
