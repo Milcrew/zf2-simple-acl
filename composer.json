@@ -1,13 +1,9 @@
 {
-    "name": "milcrew/zf2-simple-acl",
+    "name": "spalax/zf2-simple-acl",
     "description": "ACL",
     "authors": [
         {
-            "name": "Milcrew",
-            "email": "milcrew@gmail.com"
-        },
-        {
-            "name": "Milotskiy Alexey",
+            "name": "Mylotskyi Oleksii",
             "email": "spalaxinco@gmail.com"
         }
     ],
