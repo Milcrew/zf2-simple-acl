@@ -34,7 +34,8 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
 
         $recognizers = $sm->get('zf2simpleacl_module_options')->getRecognizers();
 
-        $authService = $sm->get('zfcuserauthservice');
+        $authService = new AuthenticationService($sm->get('zfcuserauthservice'));
+
         if (!empty($recognizers) && count($recognizers)) {
             $authService = new AuthenticationAggregator();
             $authService->addService(new AuthenticationService($sm->get('zfcuserauthservice')));
@@ -51,6 +52,7 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
                 $authService->addService($sm->get($recognizer));
             }
         }
+
         $eventManager->attach(new RouteGuard($sm->get('zf2simpleacl_acl'),
                                              $authService));
 
