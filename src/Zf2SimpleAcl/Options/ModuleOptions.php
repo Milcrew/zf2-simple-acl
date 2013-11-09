@@ -24,9 +24,9 @@ class ModuleOptions extends AbstractOptions
     protected $recognizers = array();
 
     /**
-     * @var string
+     * @var string | array
      */
-    protected $redirectRoute = null;
+    protected $redirectRoute = '';
 
     /**
      * @var string
@@ -65,7 +65,7 @@ class ModuleOptions extends AbstractOptions
     }
 
     /**
-     * @return string
+     * @return string | array
      */
     public function getRedirectRoute()
     {
@@ -73,11 +73,15 @@ class ModuleOptions extends AbstractOptions
     }
 
     /**
-     * @param string $redirectRoute
+     * @param string | array $redirectRoute
      * @return ModuleOptions
      */
     public function setRedirectRoute($redirectRoute)
     {
+        if (!is_string($redirectRoute) && !is_array($redirectRoute)) {
+            throw new Exception\InvalidArgumentException("Redirect route must be string or array");
+        }
+
         $this->redirectRoute = $redirectRoute;
         return $this;
     }

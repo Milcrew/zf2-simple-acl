@@ -56,7 +56,7 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
         $eventManager->attach(new RouteGuard($sm->get('zf2simpleacl_acl'),
                                              $authService));
 
-        $eventManager->attach(new RedirectionStrategy($sm->get('zf2simpleacl_module_options')));
+        $eventManager->attach(new RedirectionStrategy($sm->get('zf2simpleacl_redirect_route')));
         $eventManager->attach(new ForbiddenStrategy());
     }
 
@@ -86,6 +86,10 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface, Se
                 'zf2simpleacl_acl' => function ($sm) {
                     return new \Zf2SimpleAcl\Service\AclService($sm->get('zf2simpleacl_module_options'),
                                                                 $sm->get('router'));
+                },
+
+                'zf2simpleacl_redirect_route' => function ($sm) {
+                    return new \Zf2SimpleAcl\Service\RedirectRouteService($sm->get('zf2simpleacl_module_options'));
                 },
 
                 'zf2simpleacl_recognizer_cron' => function ($sm) {

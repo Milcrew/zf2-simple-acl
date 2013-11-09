@@ -6,6 +6,11 @@ return array(
          * who access to the forbidden page.
          *
          * By default: User will get only forbidden page and will not be redirected.
+         * Examples:
+         *  'redirect_route' => array('/frontend.*?/'=>'frontend/user/login',
+         *                            '/backend.*?/'=>'backend/user/login')
+         *  or
+         *   'redirect_route' => 'main/admin/user/login'
          */
         'redirect_route' => 'main/admin/user/login',
 

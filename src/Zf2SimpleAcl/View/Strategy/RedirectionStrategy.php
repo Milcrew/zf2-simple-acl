@@ -7,6 +7,7 @@ use Zend\Http\Response;
 use Zend\Mvc\MvcEvent;
 use Zf2SimpleAcl\Guard\RouteGuard;
 use Zf2SimpleAcl\Options\RedirectRouteOptionsInterface;
+use Zf2SimpleAcl\Service\RedirectRouteService;
 
 class RedirectionStrategy implements ListenerAggregateInterface
 {
@@ -15,14 +16,17 @@ class RedirectionStrategy implements ListenerAggregateInterface
      */
     protected $listeners = array();
 
-    protected $routeOptions = null;
+    /**
+     * @var \Zf2SimpleAcl\Service\RedirectRouteService
+     */
+    protected $redirectRouteService;
 
     /**
-     * @param RedirectRouteOptionsInterface $routeOptions
+     * @param RedirectRouteService $redirectRouteService
      */
-    public function __construct(RedirectRouteOptionsInterface $routeOptions)
+    public function __construct(RedirectRouteService $redirectRouteService)
     {
-        $this->routeOptions = $routeOptions;
+        $this->redirectRouteService = $redirectRouteService;
     }
 
     /**
@@ -60,12 +64,14 @@ class RedirectionStrategy implements ListenerAggregateInterface
         $router     = $event->getRouter();
         $error      = $event->getError();
 
+        $routeRedirectTo = $this->redirectRouteService->getMatchedRoute($event->getRouteMatch());
         if ( $result instanceof Response || ! $routeMatch  || ($response && ! $response instanceof Response) ||
-             RouteGuard::ERROR_UNAUTHENTICATE !== $error || $this->routeOptions->getRedirectRoute() == ''
+             RouteGuard::ERROR_UNAUTHENTICATE !== $error || $routeRedirectTo == ''
         ) {
             return;
         }
-        $url = $router->assemble(array(), array('name' => $this->routeOptions->getRedirectRoute()));
+
+        $url = $router->assemble(array(), array('name' => $routeRedirectTo));
 
         $response = $response ?: new Response();
 
