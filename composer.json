@@ -1,6 +1,6 @@
 {
     "name": "spalax/zf2-simple-acl",
-    "description": "ACL",
+    "description": "Simple acl module. Provide possibilities to restrict ROUTES. Provide smart redirection according on path/module where user requested restricted resource. It is can be used for restricting few modules with on ACL library.",
     "authors": [
         {
             "name": "Mylotskyi Oleksii",
