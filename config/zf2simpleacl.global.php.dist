@@ -15,11 +15,35 @@ return array(
          */
         'redirect_route' => 'main/admin/user/login',
 
+
         /**
          * Recognizers should be defined if you want the special
          * authorization process for some of role types.
          **/
         'recognizers' => array('cron'),
+
+        /**
+         * This route/routes will be used by RedirectionStrategy for redirect authorized users who
+         * requested denied resource.
+         *
+         * By default: User will get only forbidden page and will not be redirected.
+         *
+         * Examples:
+         *      In this example, authorized user will be redirected to the defined route, depends on
+         *      route which they visited before requested forbidden resource.
+         *      So authorized user who requested any frontend's child which forbidden for his
+         *      account will be redirected to the frontend/user/login route. In the second case, user
+         *      will be redirected to the backend/user/login.
+         *
+         *  'deny_redirect_route' => array('frontend' => array('admin' => array('frontend/user/login')),
+         *                                 'backend' => array('user' => array('frontend/user'),
+                                                              'admin' => array('backend'))
+         *  or
+         *      In this example, authorized user will be redirected to the defined route,
+         *      instead of see forbidden page.
+         *  'deny_redirect_route' => 'main/admin/user/login'
+         */
+         'deny_redirect_route' => 'main/admin/user/login',
 
         /**
          * It is the define default behavior for acl. If value 'permissive' it will mean
