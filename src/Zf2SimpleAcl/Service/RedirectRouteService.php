@@ -40,10 +40,8 @@ class RedirectRouteService
                 $defaultRoute = $route;
                 continue;
             }
-            if (preg_match('/^\/.*?\/$/', $dependsOn)) {
-                if (preg_match($dependsOn, $matchedRoute)) {
-                    return $route;
-                }
+            if (preg_match('/^'.preg_quote($dependsOn).'/', $matchedRoute)) {
+                return $route;
             }
         }
 

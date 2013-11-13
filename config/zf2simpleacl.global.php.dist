@@ -7,8 +7,9 @@ return array(
          *
          * By default: User will get only forbidden page and will not be redirected.
          * Examples:
-         *  'redirect_route' => array('/frontend.*?/'=>'frontend/user/login',
-         *                            '/backend.*?/'=>'backend/user/login')
+         *  'redirect_route' => array('frontend' => 'frontend/user/login',
+         *                            'backend' => 'backend/user/login',
+         *                            0 => 'frontend/user/login')
          *  or
          *   'redirect_route' => 'main/admin/user/login'
          */
