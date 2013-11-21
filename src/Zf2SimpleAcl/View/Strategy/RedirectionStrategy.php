@@ -63,6 +63,7 @@ class RedirectionStrategy implements ListenerAggregateInterface
         $response   = $event->getResponse();
         $router     = $event->getRouter();
         $error      = $event->getError();
+        $routeRedirectTo = '';
 
         if (!is_null($routeMatch)) {
             $routeRedirectTo = $this->redirectRouteService->getMatchedRoute($event->getRouteMatch());
