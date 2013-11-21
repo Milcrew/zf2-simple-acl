@@ -64,7 +64,10 @@ class RedirectionStrategy implements ListenerAggregateInterface
         $router     = $event->getRouter();
         $error      = $event->getError();
 
-        $routeRedirectTo = $this->redirectRouteService->getMatchedRoute($event->getRouteMatch());
+        if (!is_null($routeMatch)) {
+            $routeRedirectTo = $this->redirectRouteService->getMatchedRoute($event->getRouteMatch());
+        }
+
         if ( $result instanceof Response || ! $routeMatch  || ($response && ! $response instanceof Response) ||
              RouteGuard::ERROR_UNAUTHENTICATE !== $error || $routeRedirectTo == ''
         ) {
