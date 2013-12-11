@@ -8,6 +8,7 @@ use Zf2SimpleAcl\Service\AclService;
 use Zend\Authentication\AuthenticationService;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\ListenerAggregateInterface;
+use Zend\Console\Request as ConsoleRequest;
 use Zend\Mvc\MvcEvent;
 
 class RouteGuard implements ListenerAggregateInterface
@@ -79,7 +80,8 @@ class RouteGuard implements ListenerAggregateInterface
     public function onRoute(MvcEvent $event)
     {
         $matches = $event->getRouteMatch();
-        if (!$matches instanceof \Zend\Mvc\Router\RouteMatch) {
+        if (!$matches instanceof \Zend\Mvc\Router\RouteMatch ||
+            $event->getRequest() instanceof ConsoleRequest) {
             return;
         }
 
