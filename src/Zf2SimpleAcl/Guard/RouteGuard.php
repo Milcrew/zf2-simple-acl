@@ -95,7 +95,7 @@ class RouteGuard implements ListenerAggregateInterface
         /* @var $application \Zend\Mvc\ApplicationInterface */
         $application = $event->getApplication();
 
-        if (!$this->authService->hasIdentity()) {
+        if (!$this->authService->hasIdentity() || is_null($this->authService->getIdentity())) {
             if (!$this->aclService->isAllowed(null, $resource)) {
                 $event->setError(static::ERROR_UNAUTHENTICATE);
                 $application->getEventManager()->trigger(MvcEvent::EVENT_DISPATCH_ERROR, $event);
